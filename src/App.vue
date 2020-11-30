@@ -1,27 +1,24 @@
 <template>
   <div id="app">
-    <application msg="Welcome to Your Vue.js App"/>
+    <router-view></router-view>
+    <!-- <el-divider style=" margin: 0px 70px 0px 70px;" class="line"></el-divider> -->
   </div>
 </template>
 
 <script>
-import Application from './components/Application.vue'
+// import Application from './components/Application.vue'
 
 export default {
-  name: 'app',
-  components: {
-    Application
-  }
-}
+  name: "app",
+};
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
