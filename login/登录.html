@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="登录style.css">
+
+</head>
+
+<body>
+    <div class="box">
+        <h2>Login</h2>
+        <div class="inputbox">
+            <label for="name">用户名：</label>
+            <input type="text" id="username">
+        </div>
+        <div class="inputbox">
+            <label for="password"><span class="space">密</span>码：</label>
+            <img src="images/close.png" alt="" id="eye">
+            <input type="password" id="pwd">
+        </div>
+        <div>
+            <input type="submit" value="开始登录" class="submit" id="sub">
+        </div>
+        <a href="注册.html" target="_self"><input type="submit" value="没有账号？注册一个" class="submit2"></a>
+    </div>
+    <script src="登录.js"></script>
+    <script src="./reqwest.js"></script>
+</body>
+
+</html>
