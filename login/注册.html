@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="注册style.css">
+</head>
+
+<body>
+    <div class="Box">
+        <h1>新用户注册</h1>
+        <form>
+
+            <div class="inputbox">
+                <span class="p">*</span>
+                <label for="uname">用户名称：</label>
+                <input type="text" name="" id="username">
+                <p class="message">名称1-16位</p>
+            </div>
+
+            <div class="inputbox">
+                <span class="p">*</span>
+                <label for="email">邮箱地址：</label>
+                <input type="text" name="" id="emailnumber">
+                <p class="message">email地址</p>
+            </div>
+
+            <div class="inputbox">
+                <span class="p">*</span>
+                <label for="upass">登录密码：</label>
+                <input type="password" name="" id="password">
+                <p class="message">请输入5-18位密码</p>
+            </div>
+
+            <div class="inputbox">
+                <span class="p">* </span>
+                <label for="c_pwd">确认密码：</label>
+                <input type="password" name="" id="u_password">
+                <p class="message">再次输入密码</p>
+            </div>
+            <div class="xieyi">
+                <input type="checkbox" class="checkbox" name="" id="check">
+                <span class="wenzi">我已阅读并同意《用户注册协议》</span>
+            </div>
+            <input type="submit" name="" value="注册并登录" class="submit" disabled="true">
+            <div>
+                <a href="登录.html" class="right">开始登录</a>
+            </div>
+
+        </form>
+    </div>
+    <script src="./reqwest.js"></script>
+
+    <script src="注册.js" type="text/javascript"></script>
+</body>
+
+</html>
