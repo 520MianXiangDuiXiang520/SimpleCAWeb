@@ -1,6 +1,7 @@
 <template>
   <div class="form">
     <h1>待审核列表</h1>
+    <el-button type="primary" class="but" @click="publicCRL">发布 CRL</el-button>
     <el-dialog
       title="公钥"
       :visible.sync="dialogVisible"
@@ -33,6 +34,8 @@
       >
       </el-table-column>
       <el-table-column prop="common_name" label="Common Name" width="180">
+      </el-table-column>
+      <el-table-column prop="type_str" label="Type" width="180">
       </el-table-column>
       <el-table-column prop="email_address" label="Email" width="180">
       </el-table-column>
@@ -67,6 +70,22 @@ export default {
     this.getList();
   },
   methods: {
+    // 发布 CRL
+    publicCRL() {
+      let self = this;
+      this.$axios({
+        method: "post",
+        url: "/ca/update_crl",
+        data: {},
+        headers: {
+          Token: self.$cookie.get("SESSIONID"),
+        },
+      }).then(function (response) {
+        if (response.data["header"]["code"] == 200) {
+          self.$message.success("已发布");
+        }
+      });
+    },
     pass(index) {
       let self = this;
       this.$axios({
@@ -124,7 +143,10 @@ export default {
 </script>
 
 <style scoped>
+.but {
+  float: right;
+}
 .form {
-  widows: 80%;
+  margin: 50px;
 }
 </style>

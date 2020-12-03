@@ -10,29 +10,32 @@
       </el-row>
       <!-- 证书列表 -->
       <el-row :gutter="20">
-        <el-col
-          :span="6"
-          v-for="i in cers"
-          :key="i.serial_number"
-          class="cerBox"
-          ><div class="grid-content bg-purple cer" style="padding-bottom: 15px">
+        <el-col :span="6" v-for="(i, index) in cers" :key="i.serial_number" class="cerBox">
+          <div class="grid-content bg-purple cer" style="padding-bottom: 15px">
             <div class="header">
               <div v-if="i.statue == 1">
-                <i class="el-icon-success icon"></i>
-                <p class="title">证书使用中</p>
+                <i v-if="i.type == 1" class="el-icon-set-up icon"></i>
+                <i v-if="i.type == 2" class="el-icon-s-check icon"></i>
+                <p v-if="i.type == 1" class="title">代码签名证书（使用中）</p>
+                <p v-if="i.type == 2" class="title">SSL 证书（使用中）</p>
               </div>
               <!-- 证书被撤销 -->
               <div v-if="i.statue == 2">
-                <i class="el-icon-error icon2"></i>
-                <p class="title2">证书被撤销</p>
+                <i v-if="i.type == 1" class="el-icon-set-up icon2"></i>
+                <i v-if="i.type == 2" class="el-icon-s-check icon2"></i>
+                <p v-if="i.type == 1" class="title2">代码签名证书（已吊销）</p>
+                <p v-if="i.type == 2" class="title2">SSL 证书（已吊销）</p>
               </div>
               <!-- 证书过期 -->
               <div v-if="i.statue == 3">
-                <i class="el-icon-warning icon3"></i>
-                <p class="title3">证书已过期</p>
+                <i v-if="i.type == 1" class="el-icon-set-up icon3"></i>
+                <i v-if="i.type == 2" class="el-icon-s-check icon3"></i>
+                <p v-if="i.type == 1" class="title">代码签名证书（已过期）</p>
+                <p v-if="i.type == 2" class="title">SSL 证书（已过期）</p>
                 i.issuer
               </div>
             </div>
+
             <div class="body">
               <b>序列号：</b>
               <p class="line">{{ i.serial_number.toString(16) }}</p>
@@ -50,10 +53,11 @@
               <p class="line">{{ getExactTime(i.not_after) }}</p>
               <br />
             </div>
+
             <div class="footer">
               <el-row :gutter="20">
                 <el-col :span="12"
-                  ><el-button type="primary" @click="detail"
+                  ><el-button type="primary" @click="detail(index)"
                     >证书详情</el-button
                   ></el-col
                 >
@@ -87,39 +91,40 @@
                 </el-dialog>
               </el-row>
             </div>
-            <el-dialog
-              title="证书详情"
-              :visible.sync="dialogVisible"
-              width="70%"
-            >
+
+            <el-dialog title="证书详情" :visible="dialogVisible" width="70%">
+
               <el-collapse>
-                <div class="body">
+                <div class="body" v-if="JSON.stringify(cer) != '{}'">
                   <b>序列号：</b>
-                  <p class="line">{{ i.serial_number.toString(16) }}</p>
+                  <p class="line">{{ cer.serial_number.toString(16) }}</p>
                   <br />
                   <b>颁发者：</b>
-                  <p class="line">{{ i.issuer }}</p>
+                  <p class="line">{{ cer.issuer }}</p>
                   <br />
                   <b>颁发给：</b>
-                  <p class="line">{{ i.subject }}</p>
+                  <p class="line">{{ cer.subject }}</p>
                   <br />
                   <b>签名算法：</b>
-                  <p class="line">{{ i.signature_algorithm }}</p>
+                  <p class="line">{{ cer.signature_algorithm }}</p>
                   <br />
                   <b>签名哈希算法：</b>
-                  <p class="line">{{ i.public_key_algorithm }}</p>
+                  <p class="line">{{ cer.public_key_algorithm }}</p>
                   <br />
                   <b>密钥用法：</b>
-                  <p class="line">{{ i.key_usage }}</p>
+                  <p class="line">{{ cer.key_usage }}</p>
                   <br />
                   <b>增强型密钥用法：</b>
-                  <p class="line">{{ i.ext_key_usage }}</p>
+                  <p class="line">{{ cer.ext_key_usage }}</p>
                   <br />
                   <b>CRL 分发点：</b>
-                  <p class="line">{{ i.crl_distribution_points }}</p>
+                  <p class="line">{{ cer.crl_distribution_points }}</p>
                   <br />
                   <b>证书下载路径：</b>
-                  <p class="line">{{ i.download_link }}</p>
+                  <p class="line">{{ cer.download_link }}</p>
+                  <br />
+                  <b>使用者可选名称：</b>
+                  <p class="line">{{ cer.dns_name }}</p>
                   <br />
                   <b>公钥：</b>
                   <el-collapse-item title="点击展开" name="4">
@@ -128,15 +133,15 @@
                   <br />
                 </div>
               </el-collapse>
+
               <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false"
-                  >确 定</el-button
-                >
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
               </span>
+
             </el-dialog>
-          </div></el-col
-        >
+          </div>
+        </el-col>
       </el-row>
     </div>
   </div>
@@ -152,6 +157,7 @@ export default {
       cers: [],
       dialogVisible: false,
       dialogVisible2: false,
+      cer: {},
     };
   },
   mounted() {
@@ -168,11 +174,15 @@ export default {
     }).then(function (response) {
       console.log(response);
       self.cers = response.data["certificates"];
+      if(self.cers.length > 0) {
+        self.cer = self.cers[0]
+      }
     });
   },
   methods: {
     // 证书详情
-    detail() {
+    detail(i) {
+      this.cer = this.cers[i]
       this.dialogVisible = true;
     },
     // 吊销证书

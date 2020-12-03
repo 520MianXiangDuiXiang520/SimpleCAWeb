@@ -18,8 +18,8 @@ Vue.prototype.$cookie = cookie;
 // axios.defaults.withCredentials = true
 
 Vue.config.productionTip = false
-// axios.defaults.baseURL = 'http://localhost:8080/api/';
-axios.defaults.baseURL = 'http://39.106.168.39:82/api/';
+axios.defaults.baseURL = 'http://localhost:8080/api/';
+// axios.defaults.baseURL = 'http://39.106.168.39:82/api/';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 Vue.prototype.$axios = axios

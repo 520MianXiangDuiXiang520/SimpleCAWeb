@@ -9,10 +9,10 @@ Vue.use(Router) //使用vue-router
 
 export default new Router({
     routes: [
-        // {
-        //     path: '/',
-        //     redirect: '/login/'
-        // },
+        {
+            path: '/',
+            redirect: '/csr'
+        },
   
         {
             path: "/login/:token",

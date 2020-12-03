@@ -2,13 +2,63 @@
   <div>
     <active />
     <step :step="step" />
+
+    <!-- 选择证书类型 -->
     <div v-if="step == 1" class="form">
+      <el-row :gutter="50">
+        <!-- 代码签名 -->
+        <el-col :span="12" >
+          <el-card shadow="hover" >
+            <div class="grid-content bg-purple choise codeSign" @click="choiseCodeSign">
+              <div class="sslIcon">
+                <i class="el-icon-set-up"></i>
+              </div>
+              <h3>代码签名证书</h3>
+              <div class="use">
+                <p align="left" class="info">
+                  <i class="el-icon-info"></i> 代码签名证书为软件开发商提供了一个理想的解决方案，使得软件开发商能对其软件代码进行数字签名。
+                </p>
+                <p align="left" class="info">
+                  <i class="el-icon-info"></i> 通过对代码的数字签名来标识软件来源以及软件开发者的真实身份，保证代码在签名之后不被恶意篡改。使用户在下载已经签名的代码时，能够有效的验证该代码的可信度。
+                </p>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+
+        <!-- ssl -->
+        <el-col :span="12" >
+          <el-card shadow="hover">
+          <div class="grid-content bg-purple choise ssl" @click="choiseSSL">
+            <div class="sslIcon">
+              <i class="el-icon-s-check"></i>
+            </div>
+            <h3>SSL 证书</h3>
+            <div class="use">
+                <p align="left" class="info">
+                  服务器部署了 SSL 证书后可以确保用户在浏览器上输入的机密信息和从服务器上查询的机密信息从用户电脑到服务器之间的传输链路上是高强度加密传输的，是不可能被非法篡改和窃取的。同时向网站访问者证明了服务器的真实身份，此真实身份是通过第三方权威机构验证的。
+                  <br><br>
+                  <b>即 SSL 证书的功能总结为：</b><br>
+                  <i class="el-icon-info"></i> <b>数据加密</b> <br/>
+                  <i class="el-icon-info"></i> <b>身份认证</b>
+                </p>
+              </div>
+          </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+
+    <!-- 提交 CSR 信息 -->
+    <div v-if="step == 2" class="form">
       <el-row :gutter="20">
         <el-col :span="12"
-          ><div class="grid-content bg-purple">
+          ><div class="grid-content">
             <el-card class="box-card">
-              <div class="tap" >
-                <p align="left"><b>您需要提供您的必要信息，以便我们核验您的身份。</b></p>
+              <div class="tap">
+                <p align="left">
+                  <b>您需要提供您的必要信息，以便我们核验您的身份。</b>
+                </p>
                 <p align="left">
                   <i class="el-icon-info"></i> 如果您有自己的 CSR
                   文件，可以直接拖拽至下方上传，我们会帮您解析。
@@ -24,7 +74,7 @@
               <el-upload
                 class="upload-demo"
                 drag
-                action="http://localhost:8080/api/ca/file"
+                action="http://localhost:8080/api/ca/csr_file"
                 name="CSR_FILE"
                 :on-success="uploadSuccess"
                 :with-credentials="true"
@@ -42,7 +92,7 @@
           </div></el-col
         >
         <el-col :span="12"
-          ><div class="grid-content bg-purple">
+          ><div class="grid-content">
             <el-form
               :model="ruleForm"
               :rules="rules"
@@ -75,10 +125,13 @@
               <el-form-item label="电子邮件" prop="email">
                 <el-input v-model="ruleForm.email"></el-input>
               </el-form-item>
+              <el-form-item label="域名信息" prop="dns" v-if="type == 2">
+                <el-input v-model="ruleForm.dns" ></el-input>
+                <i class="el-icon-info"></i> 多个域使用空格分割
+              </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submitForm('ruleForm')"
-                  >提交</el-button
-                >
+                <el-button type="primary" v-if="type == 1" @click="submitForm('ruleForm')">提交</el-button>
+                <el-button type="primary" v-if="type == 2" @click="submitForm('ruleForm')">提交</el-button>
                 <el-button @click="resetForm('ruleForm')">重置</el-button>
               </el-form-item>
             </el-form>
@@ -87,7 +140,8 @@
       </el-row>
     </div>
 
-    <div v-if="step == 2" v-loading.fullscreen.lock="loading">
+    <!-- 提交公钥信息 -->
+    <div v-if="step == 3" v-loading.fullscreen.lock="loading">
       <div class="form">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -122,7 +176,8 @@
       </div>
     </div>
 
-    <div v-if="step == 3">
+    <!-- 成功 -->
+    <div v-if="step == 4">
       <div class="from">
         <i class="el-icon-success icon"></i>
         <p>您的申请信息以成功提交，正在等待 CA 审核</p>
@@ -148,8 +203,10 @@ export default {
         organization_unit_name: "",
         common_name: "",
         email: "",
+        dns:""
       },
       step: 1,
+      type: 0,
       requestID: "",
       loading: false,
       pk: "",
@@ -177,6 +234,16 @@ export default {
     };
   },
   methods: {
+    // 选择代码签名证书
+    choiseCodeSign() {
+      this.type = 1
+      this.step = 2
+    },
+    // 选择 SSL 证书
+    choiseSSL() {
+      this.type = 2
+      this.step = 2
+    },
     // 文件上传成功后的钩子
     uploadSuccess(response) {
       console.log(response);
@@ -189,7 +256,7 @@ export default {
         this.ruleForm.organization_unit_name = response["organizational_unit"];
         this.ruleForm.common_name = response["common_name"];
         this.ruleForm.email = response["email_address"];
-        this.pk = response["public_key"]
+        this.pk = response["public_key"];
       } else {
         this.$message.error(response["header"]["msg"]);
       }
@@ -222,14 +289,14 @@ export default {
       this.loading = false;
     },
 
-    // 提交CSR
+    // 提交 代码签名 CSR
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           let self = this;
           this.$axios({
             method: "post",
-            url: "/ca/csr",
+            url: "/ca/code_sign_csr",
             data: {
               country: self.ruleForm.country,
               province: self.ruleForm.province,
@@ -243,12 +310,12 @@ export default {
               Token: self.$cookie.get("SESSIONID"),
             },
           }).then(function (response) {
-            if(response.data['header']['code'] == 200) {
-              self.$message.success("提交成功")
+            if (response.data["header"]["code"] == 200) {
+              self.$message.success("提交成功");
               self.requestID = response.data["csr_id"];
-              self.step = 2;
+              self.step = 3;
             } else {
-              self.$message.error(response['header']['msg'])
+              self.$message.error(response["header"]["msg"]);
             }
           });
         } else {
@@ -257,6 +324,45 @@ export default {
         }
       });
     },
+
+// 提交 SSL CRS
+
+  submitSSLForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid && this.ruleForm.dns.length > 0) {
+          let self = this;
+          this.$axios({
+            method: "post",
+            url: "/ca/ssl_csr",
+            data: {
+              country: self.ruleForm.country,
+              province: self.ruleForm.province,
+              locality: self.ruleForm.locality,
+              organization: self.ruleForm.organization,
+              common_name: self.ruleForm.common_name,
+              email_address: self.ruleForm.email,
+              organizational_unit: self.ruleForm.organization_unit_name,
+              dns_names: self.ruleForm.dns
+            },
+            headers: {
+              Token: self.$cookie.get("SESSIONID"),
+            },
+          }).then(function (response) {
+            if (response.data["header"]["code"] == 200) {
+              self.$message.success("提交成功");
+              self.requestID = response.data["csr_id"];
+              self.step = 3;
+            } else {
+              self.$message.error(response["header"]["msg"]);
+            }
+          });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
@@ -266,7 +372,7 @@ export default {
       let self = this;
       this.$axios({
         method: "post",
-        url: "/ca/request",
+        url: "/ca/upload_pk",
         data: {
           csrid: self.requestID,
           public_key: self.pk,
@@ -275,12 +381,12 @@ export default {
           Token: self.$cookie.get("SESSIONID"),
         },
       }).then(function (response) {
-        if(response.data['header']['code'] == 200) {
-              self.$message.success("提交成功")
-              self.step = 3;
-            } else {
-              self.$message.error(response['header']['msg'])
-            }
+        if (response.data["header"]["code"] == 200) {
+          self.$message.success("提交成功");
+          self.step = 4;
+        } else {
+          self.$message.error(response["header"]["msg"]);
+        }
       });
     },
   },
@@ -288,13 +394,20 @@ export default {
 </script>
 
 <style scoped>
+.use {
+  padding: 15px;
+}
 .code {
   background-color: #303133;
   color: aliceblue;
   padding: 20px;
   margin: 0 0 15px 10px;
 }
-.el-card{
+.sslIcon {
+  padding: 25px 0 0 0;
+  font-size: 77px;
+}
+.el-card {
   margin-left: 10px;
 }
 .tap p {
@@ -320,8 +433,18 @@ body {
 .tag {
   height: 450px;
 }
+.choise {
+  height: 450px;
+}
 .icon {
   font-size: 77px;
   color: #67c23a;
+}
+.bg-purple {
+  background: #d3dce6;
+}
+.info {
+  margin-left: 30px;
+  color: #303133;
 }
 </style>
