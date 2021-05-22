@@ -190,7 +190,7 @@ export default {
       let self = this;
       this.$axios({
         method: "post",
-        url: "/ca/crl",
+        url: "/ca/revoke",
         data: {
           serial_number: serial,
         },

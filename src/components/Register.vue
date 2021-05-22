@@ -13,8 +13,14 @@
           <div class="input">
             <el-input placeholder="请输入密码" v-model="password" show-password></el-input>
           </div>
+          <div class="input">
+            <el-input placeholder="请重复密码" v-model="pswagain" show-password></el-input>
+          </div>
+          <div class="input">
+            <el-input placeholder="请输入邮箱" v-model="email" show-password></el-input>
+          </div>
           <div class="button">
-            <el-button type="primary" @click="login()">登录</el-button>
+            <el-button type="primary" @click="register">登录</el-button>
           </div>
         </el-card>
       </el-col>
@@ -33,29 +39,31 @@ export default {
       this: null,
       username: "",
       password: "",
+      pswagain: "",
+      email: "",
       token: "",
     };
   },
   methods: {
-    login() {
+    register() {
       let self = this;
-      if (this.username == "" || this.password == "") {
-        alert("you mast input password and username");
+      if (this.username == "" || this.password == "" || this.pswagain == "" || this.email == "" || this.password != this.pswagain) {
+        alert("参数错误");
       } else {
         this.axios({
           method: "post",
-          url: "/auth/login",
+          url: "/auth/register",
           data: {
             username: this.username,
             password: this.password,
+            email: this.email,
           },
         }).then(function (response) {
           if (response.data["header"]["code"] != 200) {
             alert("用户名或密码错误");
           } else {
-            self.token = response.data["token"];
-            self.$cookie.set("SESSIONID", response.data["token"]);
-            self.$router.push("/csr");
+            alert("注册成功")
+            self.$router.push("/login");
           }
         });
       }
